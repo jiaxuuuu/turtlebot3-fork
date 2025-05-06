@@ -3,28 +3,29 @@
   <xacro:arg name="laser_visual"  default="false"/>
   <xacro:arg name="camera_visual" default="false"/>
   <xacro:arg name="imu_visual"    default="false"/>
+  <xacro:arg name="tf_prefix"    default=""/>
 
   <gazebo reference="base_link">
     <material>Gazebo/DarkGrey</material>
   </gazebo>
 
   <gazebo reference="wheel_left_link">
-    <mu1>10000</mu1>
-    <mu2>10000</mu2>
-    <kp>500000.0</kp>
-    <kd>10.0</kd>
-    <minDepth>0.001</minDepth>
+    <mu1>1000000000</mu1>
+    <mu2>1000000000</mu2>
+    <kp>500000000.0</kp>
+    <kd>10000.0</kd>
+    <minDepth>0.0005</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
     <material>Gazebo/FlatBlack</material>
   </gazebo>
 
   <gazebo reference="wheel_right_link">
-    <mu1>10000</mu1>
-    <mu2>10000</mu2>
-    <kp>500000.0</kp>
-    <kd>10.0</kd>
-    <minDepth>0.001</minDepth>
+    <mu1>1000000000</mu1>
+    <mu2>1000000000</mu2>
+    <kp>500000000.0</kp>
+    <kd>10000.0</kd>
+    <minDepth>0.0005</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
     <material>Gazebo/FlatBlack</material>
@@ -58,14 +59,16 @@
     <material>Gazebo/Grey</material>
   </gazebo>
 
+  <xacro:property name="ns" value="turtlebot3" />
+
   <gazebo>
     <plugin name="turtlebot3_waffle_pi_controller" filename="libgazebo_ros_diff_drive.so">
       <commandTopic>cmd_vel</commandTopic>
       <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
+      <odometryFrame>$(arg tf_prefix)/odom</odometryFrame>
       <odometrySource>world</odometrySource>
       <publishOdomTF>true</publishOdomTF>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <robotBaseFrame>$(arg tf_prefix)/base_footprint</robotBaseFrame>
       <publishWheelTF>false</publishWheelTF>
       <publishTf>true</publishTf>
       <publishWheelJointState>true</publishWheelJointState>
@@ -85,7 +88,7 @@
     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
       <alwaysOn>true</alwaysOn>
       <bodyName>imu_link</bodyName>
-      <frameName>imu_link</frameName>
+      <frameName>$(arg tf_prefix)/imu_link</frameName>
       <topicName>imu</topicName>
       <serviceName>imu_service</serviceName>
       <gaussianNoise>0.0</gaussianNoise>
@@ -113,9 +116,9 @@
   <gazebo reference="base_scan">
     <material>Gazebo/FlatBlack</material>
     <sensor type="ray" name="lds_lfcd_sensor">
-      <pose>0 0 0 0 0 0</pose>
-      <visualize>$(arg laser_visual)</visualize>
-      <update_rate>5</update_rate>
+      <pose>0 0 -0.28 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
       <ray>
         <scan>
           <horizontal>
@@ -126,9 +129,9 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.120</min>
+          <min>0.40</min>
           <max>3.5</max>
-          <resolution>0.015</resolution>
+          <resolution>0.01</resolution>
         </range>
         <noise>
           <type>gaussian</type>
@@ -138,7 +141,7 @@
       </ray>
       <plugin name="gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
         <topicName>scan</topicName>
-        <frameName>base_scan</frameName>
+        <frameName>$(arg tf_prefix)/base_scan</frameName>
       </plugin>
     </sensor>
   </gazebo>
